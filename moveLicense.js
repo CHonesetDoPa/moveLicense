@@ -27,7 +27,7 @@ fs.readFile(packageJsonPath, 'utf8', (err, data) => {
         console.log('afterPack configuration has been successfully added to package.json!');
 
         const moveLicenseContent = `
-// moveLicense.js @ 1.0.0
+// moveLicense.js @ 1.1.0
 // This file is used to move the LICENSE files to the root of the app directory.
 
 const path = require('path');
