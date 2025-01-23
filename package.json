@@ -4,7 +4,7 @@
   "description": "move the LICENSE files to the root of the app directory.",
   "main": "updatePackage.js",
   "bin": {
-    "my-command": "./updatePackage.js"
+    "moveLicense": "./updatePackage.js"
   },
   "scripts": {
     "start": "node updatePackage.js"
