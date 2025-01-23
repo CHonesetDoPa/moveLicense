@@ -1,13 +1,10 @@
 {
   "name": "movelicense",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "move the LICENSE files to the root of the app directory.",
-  "main": "updatePackage.js",
-  "bin": {
-    "moveLicense": "./updatePackage.js"
-  },
+  "main": "moveLicense.js",
   "scripts": {
-    "start": "node updatePackage.js"
+    "move": "node moveLicense.js"
   },
   "repository": {
     "type": "git",
