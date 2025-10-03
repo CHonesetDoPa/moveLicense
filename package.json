@@ -4,7 +4,7 @@
   "description": "Automatically organize LICENSE files for Electron apps into a clean directory structure",
   "main": "index.js",
   "bin": {
-    "movelicense": "./bin/cli.js"
+    "movelicense": "bin/cli.js"
   },
   "scripts": {
     "postinstall": "node install.js",
