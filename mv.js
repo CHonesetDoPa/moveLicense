@@ -19,33 +19,54 @@ module.exports = async (context) => {
   }
 
   const licenseDir = path.join(appOutDir, 'license');
-  const projectLicenseDir = path.join(process.cwd(), 'license'); 
 
   await fs.ensureDir(licenseDir);
 
   const moveFile = async (src, dest) => {
     try {
-      await fs.move(src, dest, { overwrite: true });
-      console.log(`Moved ${src} to ${dest}`);
+      // Check if source file exists before moving
+      if (await fs.pathExists(src)) {
+        await fs.move(src, dest, { overwrite: true });
+        console.log(`Moved ${src} to ${dest}`);
+      }
     } catch (error) {
       console.error(`Error moving ${src} to ${dest}:`, error);
     }
   };
 
+  const copyFile = async (src, dest) => {
+    try {
+      // Check if source file exists before copying
+      if (await fs.pathExists(src)) {
+        await fs.copy(src, dest, { overwrite: true });
+        console.log(`Copied ${src} to ${dest}`);
+      }
+    } catch (error) {
+      console.error(`Error copying ${src} to ${dest}:`, error);
+    }
+  };
+
+  // Move Electron and Chromium license files
   await moveFile(path.join(unpackedDir, 'LICENSE.electron.txt'), path.join(licenseDir, 'LICENSE.electron.txt'));
   await moveFile(path.join(unpackedDir, 'LICENSES.chromium.html'), path.join(licenseDir, 'LICENSES.chromium.html'));
 
+  // Copy custom project license files (case-insensitive detection for 'license' or 'licenses')
   try {
-    const projectLicensePath = path.join(process.cwd(), 'license');
-    const stats = await fs.stat(projectLicensePath);
+    const rootFiles = await fs.readdir(process.cwd());
+    const licenseEntries = rootFiles.filter(file => ['license', 'licenses'].includes(file.toLowerCase()));
     
-    if (stats.isDirectory()) {
-      const files = await fs.readdir(projectLicensePath);
-      for (const file of files) {
-        await moveFile(path.join(projectLicensePath, file), path.join(licenseDir, file));
+    for (const licenseEntry of licenseEntries) {
+      const projectLicensePath = path.join(process.cwd(), licenseEntry);
+      const stats = await fs.stat(projectLicensePath);
+      
+      if (stats.isDirectory()) {
+        const files = await fs.readdir(projectLicensePath);
+        for (const file of files) {
+          await copyFile(path.join(projectLicensePath, file), path.join(licenseDir, file));
+        }
+      } else if (stats.isFile()) {
+        await copyFile(projectLicensePath, path.join(licenseDir, path.basename(projectLicensePath)));
       }
-    } else if (stats.isFile()) {
-      await moveFile(projectLicensePath, path.join(licenseDir, 'license'));
     }
   } catch (error) {
     if (error.code !== 'ENOENT') {

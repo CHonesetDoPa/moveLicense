@@ -43,13 +43,26 @@ try {
   const moveLicenseSource = path.join(__dirname, 'mv.js');
   const moveLicenseTarget = path.join(targetProjectRoot, 'moveLicense.js');
 
+  // Check if source file exists
+  if (!fs.existsSync(moveLicenseSource)) {
+    console.error('MoveLicense: Source file mv.js not found. Installation may be corrupted.');
+    return;
+  }
+
+  // Check if target already exists
+  if (fs.existsSync(moveLicenseTarget)) {
+    console.log('MoveLicense: moveLicense.js already exists in target directory.');
+    console.log('   Run "npx movelicense --force" to overwrite if needed.');
+    return;
+  }
+
   fs.copyFileSync(moveLicenseSource, moveLicenseTarget);
 
   // Update package.json
   packageJson.build = packageJson.build || {};
   packageJson.build.afterPack = './moveLicense.js';
 
-  fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
+  fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n');
 
   console.log('MoveLicense: Successfully configured!');
   console.log('   - Added afterPack hook to package.json');
