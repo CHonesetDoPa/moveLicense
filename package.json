@@ -1,6 +1,6 @@
 {
   "name": "movelicense",
-  "version": "1.2.2",
+  "version": "1.3.1",
   "description": "Automatically organize LICENSE files for Electron apps into a clean directory structure",
   "main": "index.js",
   "bin": {

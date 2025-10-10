@@ -1,6 +1,5 @@
-// mv.js @ 1.2.2
+// mv.js @ 1.3.1
 // This file is used to move the LICENSE files to the root of the app directory.
-// But this time, you'll need to add it to the `package.json` file yourself.
 
 const path = require('path');
 const fs = require('fs-extra');
@@ -12,6 +11,7 @@ module.exports = async (context) => {
   switch (electronPlatformName) {
     case 'win32':
     case 'linux':
+    case 'darwin':
       unpackedDir = path.join(appOutDir);
       break;
     default:
@@ -27,7 +27,7 @@ module.exports = async (context) => {
       // Check if source file exists before moving
       if (await fs.pathExists(src)) {
         await fs.move(src, dest, { overwrite: true });
-        console.log(`Moved ${src} to ${dest}`);
+        console.log(`  • Moved ${src} to ${dest}`);
       }
     } catch (error) {
       console.error(`Error moving ${src} to ${dest}:`, error);
@@ -39,7 +39,7 @@ module.exports = async (context) => {
       // Check if source file exists before copying
       if (await fs.pathExists(src)) {
         await fs.copy(src, dest, { overwrite: true });
-        console.log(`Copied ${src} to ${dest}`);
+        console.log(`  • Copied ${src} to ${dest}`);
       }
     } catch (error) {
       console.error(`Error copying ${src} to ${dest}:`, error);
@@ -52,11 +52,11 @@ module.exports = async (context) => {
 
   // Copy custom project license files (case-insensitive detection for 'license' or 'licenses')
   try {
-    const rootFiles = await fs.readdir(process.cwd());
-    const licenseEntries = rootFiles.filter(file => ['license', 'licenses'].includes(file.toLowerCase()));
+    const rootFiles = await fs.readdir(context.packager.projectDir);
+    const licenseEntries = rootFiles.filter(file => /^licen[sc]e/i.test(file));
     
     for (const licenseEntry of licenseEntries) {
-      const projectLicensePath = path.join(process.cwd(), licenseEntry);
+      const projectLicensePath = path.join(context.packager.projectDir, licenseEntry);
       const stats = await fs.stat(projectLicensePath);
       
       if (stats.isDirectory()) {
