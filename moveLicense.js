@@ -27,7 +27,7 @@ fs.readFile(packageJsonPath, 'utf8', (err, data) => {
         console.log('afterPack configuration has been successfully added to package.json!');
 
         const moveLicenseContent = `
-// moveLicense.js @ 1.1.0
+// moveLicense.js @ 1.2.2
 // This file is used to move the LICENSE files to the root of the app directory.
 
 const path = require('path');
@@ -64,12 +64,21 @@ module.exports = async (context) => {
   await moveFile(path.join(unpackedDir, 'LICENSES.chromium.html'), path.join(licenseDir, 'LICENSES.chromium.html'));
 
   try {
-    const files = await fs.readdir(projectLicenseDir);
-    for (const file of files) {
-      await moveFile(path.join(projectLicenseDir, file), path.join(licenseDir, file));
+    const projectLicensePath = path.join(process.cwd(), 'license');
+    const stats = await fs.stat(projectLicensePath);
+    
+    if (stats.isDirectory()) {
+      const files = await fs.readdir(projectLicensePath);
+      for (const file of files) {
+        await moveFile(path.join(projectLicensePath, file), path.join(licenseDir, file));
+      }
+    } else if (stats.isFile()) {
+      await moveFile(projectLicensePath, path.join(licenseDir, 'license'));
     }
   } catch (error) {
-    console.error('Error copying project root LICENSE files:', error);
+    if (error.code !== 'ENOENT') {
+      console.error('Error copying project root LICENSE files:', error);
+    }
   }
 };
 `;
