@@ -6,7 +6,7 @@ const path = require('path');
 const { program } = require('commander');
 
 program
-  .version('1.3.0')
+  .version('1.3.2')
   .description('MoveLicense - Organize LICENSE files for Electron apps')
   .option('-f, --force', 'Force reconfiguration even if already setup')
   .option('--clean', 'Remove moveLicense configuration from project')
